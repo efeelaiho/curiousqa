@@ -1,2 +1,2 @@
 # curiousqa
-A simple, anonymous, and social, Q&amp;A platform
+A simple, anonymous/non-anonymous(voluntarily), and social, Q&A platform
