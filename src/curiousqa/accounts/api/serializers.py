@@ -10,7 +10,7 @@ class AccountRegistrationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Account
-        fields = ['username', 'email', 'password']
+        fields = ['account_id', 'username', 'email', 'password']
 
     def create(self, validated_data):
         # unpack validated data

@@ -1,9 +1,12 @@
-from django.db import models
-from django.contrib.auth.models import (
-    BaseUserManager, AbstractBaseUser
-)
+import uuid
 
-# Create your models here.
+from django.conf import settings
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from rest_framework.authtoken.models import Token
+
 
 class AccountManager(BaseUserManager):
     def create_user(self, email, username, password=None):
@@ -28,12 +31,12 @@ class AccountManager(BaseUserManager):
             username=username
         )
         user.is_admin = True
-        user.is_staff = True
         user.is_superuser = True
         user.save(using=self._db)
         return user
 
 class Account(AbstractBaseUser):
+    account_id =  models.UUIDField(default=uuid.uuid4().hex, editable=False, unique=True)
     email      =  models.EmailField(verbose_name="email", max_length=255, unique=True)
     username   =  models.CharField(max_length=25, unique=True)
 
@@ -68,3 +71,8 @@ class Account(AbstractBaseUser):
         # Simplest possible answer: All admins are staff
         return self.is_admin
 
+@receiver(post_save, sender=settings.AUTH_USER_MODEL)
+def create_authentication_token(sender, instance=None, created=False, **kwargs):
+    if created:
+        Token.objects.create(user=instance)
+    pass

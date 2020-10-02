@@ -7,10 +7,10 @@ class AccountAdmin(BaseUserAdmin):
     # The fields to be used in displaying the Account model.
     # These override the definitions on the base UserAdmin
     # that reference specific fields on auth.User.
-    list_display = ('email', 'username', 'last_login', 'date_joined', 'is_staff','is_admin')
-    search_fields = ('email', 'username')
+    list_display = ('id', 'account_id', 'email', 'username', 'last_login', 'date_joined', 'is_staff','is_admin')
+    search_fields = ('email', 'username', 'account_id', 'id')
 
-    readonly_fields=( 'last_login', 'date_joined')
+    readonly_fields=( 'last_login', 'date_joined', 'account_id')
 
     list_filter = ('is_admin',)
     ordering = ('email',)
