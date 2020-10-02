@@ -36,17 +36,18 @@ class AccountManager(BaseUserManager):
         return user
 
 class Account(AbstractBaseUser):
-    account_id =  models.UUIDField(default=uuid.uuid4().hex, editable=False, unique=True)
-    email      =  models.EmailField(verbose_name="email", max_length=255, unique=True)
-    username   =  models.CharField(max_length=25, unique=True)
+    account_id   =  models.CharField(default=uuid.uuid4().hex, editable=False, unique=True, max_length=32)
+    email        =  models.EmailField(verbose_name="email", max_length=255, unique=True)
+    username     =  models.CharField(max_length=25, unique=True)
+    is_verified  =  models.BooleanField(default=False)
 
     is_staff	 = models.BooleanField(default=False)
     is_admin	 = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
 
-    is_active   = models.BooleanField(default=True)
-    date_joined = models.DateTimeField(verbose_name='date joined', auto_now_add=True)
-    last_login  = models.DateTimeField(verbose_name='last login', auto_now=True)
+    is_active    = models.BooleanField(default=True)
+    date_joined  = models.DateTimeField(verbose_name='date joined', auto_now_add=True)
+    last_login   = models.DateTimeField(verbose_name='last login', auto_now=True)
 
     objects = AccountManager()
 

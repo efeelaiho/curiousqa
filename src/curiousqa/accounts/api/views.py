@@ -1,12 +1,12 @@
 from accounts.api.serializers import AccountRegistrationSerializer
 from django.shortcuts import render
 from rest_framework import status
+from rest_framework.authtoken.models import Token
+from rest_framework.decorators import permission_classes
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
-from rest_framework.authtoken.models import Token
+from rest_framework.permissions import IsAuthenticated
 
-
-# Create your views here.
 
 class AccountRegisterView(GenericAPIView):
     serializer_class = AccountRegistrationSerializer
@@ -22,13 +22,19 @@ class AccountRegisterView(GenericAPIView):
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class AccountLoginView(GenericAPIView):
+
+@permission_classes((IsAuthenticated,))
+class AccountsUserView(GenericAPIView):
     def post(self, request):
-        data = request.data
+        account = request.user
+        if account:
+            data = {}
+            data['account_id'] = account.account_id
+            data['username'] = account.username
+            data['email'] = account.email
 
-        username = data.get('username', '')
-        password = data.get('password', '')
+            return Response(data, status=status.HTTP_200_OK)
 
-        pass  
+        return Response({'response': 'Invalid Auth'}, status=status.HTTP_401_UNAUTHORIZED)
 
         
