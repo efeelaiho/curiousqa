@@ -15,8 +15,7 @@ jobs:
             echo $PIPENV_PIPFILE
             cd src/curiousqa/
             pipenv install
-          environment:
-            PIPENV_PIPFILE: src/curiousqa/Pipfile
+          
       - run:
           name: Run curiousqa Python Test
           command: pipenv run python src/curiousqa/manage.py test
