@@ -6,19 +6,17 @@ orbs:
 jobs:
   build-and-test-curiousqa:
     executor: python/default
+    working_directory: ~/src/curiousqa
     steps:
       - checkout
       - run:
           name: Setup pipenv
           command: |  # use pipenv to install dependencies
             sudo pip install pipenv
-            echo $PIPENV_PIPFILE
-            cd src/curiousqa/
-            pipenv install
-          
+            pipenv install        
       - run:
           name: Run curiousqa Python Test
-          command: pipenv run python src/curiousqa/manage.py test
+          command: pipenv run python manage.py test
           #name: Test
 
 workflows:
