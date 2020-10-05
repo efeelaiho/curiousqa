@@ -13,7 +13,7 @@ jobs:
           command: |  # use pipenv to install dependencies
             sudo pip install pipenv
             echo $PIPENV_PIPFILE
-            pipenv --venv
+            pipenv install
           environment:
             PIPENV_PIPFILE: src/curiousqa/Pipfile
       - run:
