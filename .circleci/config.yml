@@ -9,12 +9,11 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Run curiousqa Python Test
+          name: Install Dependencies and Run curiousqa Python Test
           command: |  # use pipenv to install dependencies
             sudo pip install pipenv
             pipenv install
-            pipenv shell
-            python manage.py test
+            pipenv run python manage.py test 
           working_directory: src/curiousqa
 
 workflows:
