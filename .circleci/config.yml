@@ -4,18 +4,23 @@ orbs:
   python: circleci/python@0.2.1
 
 jobs:
-  build-and-test:
+  build-and-test-curiousqa:
     executor: python/default
     steps:
       - checkout
-      - python/load-cache
-      - python/install-deps
-      - python/save-cache
       - run:
-          command: ./src/curiousqa/manage.py test
-          name: Test
+          name: Setup pipenv
+          command: |  # use pipenv to install dependencies
+            sudo pip install pipenv
+            pipenv --venv
+          environment:
+            PIPENV_PIPFILE: src/curiousqa/Pipfile
+      - run:
+          name: Run curiousqa Python Test
+          command: pipenv run python src/curiousqa/manage.py test
+          #name: Test
 
 workflows:
   main:
     jobs:
-      - build-and-test
+      - build-and-test-curiousqa
