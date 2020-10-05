@@ -16,7 +16,7 @@ jobs:
             pipenv install        
       - run:
           name: Run curiousqa Python Test
-          command: pipenv run python manage.py test
+          command: pipenv run python src/curiousqa/manage.py test
           #name: Test
 
 workflows:
