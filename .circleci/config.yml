@@ -12,9 +12,9 @@ jobs:
           name: Setup pipenv
           command: |  # use pipenv to install dependencies
             sudo pip install pipenv
-            pipenv install
-          environment:
-            PIPENV_PIPFILE: src/curiousqa/Pipfile
+            set -gx PIPENV_PIPFILE src/curiousqa/Pipfile
+            set -e PIPENV_PIPFILE
+            pipenv --venv
       - run:
           name: Run curiousqa Python Test
           command: pipenv run python src/curiousqa/manage.py test
