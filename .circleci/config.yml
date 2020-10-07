@@ -1,0 +1,22 @@
+version: 2.1
+
+orbs:
+  python: circleci/python@0.2.1
+
+jobs:
+  build-and-test-curiousqa:
+    executor: python/default
+    steps:
+      - checkout
+      - run:
+          name: Install Dependencies and Run curiousqa Python Test
+          command: |  # use pipenv to install dependencies
+            sudo pip install pipenv
+            pipenv install
+            pipenv run python manage.py test 
+          working_directory: src/curiousqa
+
+workflows:
+  main:
+    jobs:
+      - build-and-test-curiousqa
