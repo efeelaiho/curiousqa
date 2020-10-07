@@ -15,3 +15,13 @@ class AccountRegistrationSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         # unpack validated data
         return Account.objects.create_user(**validated_data)
+
+class AccountSignInSerializer(serializers.Serializer):
+    email = serializers.EmailField(required=True, allow_blank=False)
+    password = serializers.CharField(required=True, allow_blank=False)
+
+class AccountSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Account
+        fields = ['account_id', 'username', 'email', ]
+        
