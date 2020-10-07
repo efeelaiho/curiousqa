@@ -24,7 +24,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 ###### THIS IS A FAKE  SECRET_KEY ##########
 SECRET_KEY = '+^l93%^uo6_5sodo^-m4hk5&ge$%%4-er=htctc_1q5$do3+3y'
-JWT_SECRET_KEY = os.getenv('JWT_SECRET', 'myprecious')
+
+TOKEN_EXPIRED_AFTER_SECONDS = 86400 # 86400 seconds in a day
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -51,7 +52,8 @@ AUTH_USER_MODEL = 'accounts.Account'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.TokenAuthentication',
+        #'rest_framework.authentication.TokenAuthentication',
+        'accounts.api.authentications.ExpiringTokenAuthentication',  # custom authentication class
     ],
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
