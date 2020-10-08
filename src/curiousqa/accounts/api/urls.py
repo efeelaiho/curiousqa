@@ -8,4 +8,3 @@ urlpatterns = [
     path('auth/signin', AccountSignInView.as_view(), name='signin'),
     path('', AccountsUserView.as_view(), name='account'),
 ]
-
