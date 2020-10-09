@@ -60,6 +60,14 @@ class AccountSignInView(GenericAPIView):
             'token_expires_in': get_expires_in(token)}, status=status.HTTP_200_OK)
 
 
+class AccountSignOutView(GenericAPIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        request.user.auth_token.delete()
+        return Response(status=status.HTTP_200_OK)
+
+
 class AccountsUserView(GenericAPIView):
     permission_classes = [IsAuthenticated]
 

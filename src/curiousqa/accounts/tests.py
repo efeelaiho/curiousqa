@@ -11,11 +11,11 @@ from accounts.models import Account
 
 
 class RegistrationTestCase(APITestCase):
+    """
+    Ensure we can create a new account object via registration.
+    """
 
     def test_registration(self):
-        """
-        Ensure we can create a new account object via registration.
-        """
         data = {'username': 'testcase', 'email': 'testcase@curiousqa.com',
                 'password': 'testcasePaSsW0rd123'}
         response = self.client.post(path='/accounts/auth/register', data=data)
@@ -46,8 +46,36 @@ class SignInTestCase(APITestCase):
         self.assertEquals(response.status_code, status.HTTP_200_OK)
 
 
+class SignOutTestCase(APITestCase):
+    """
+    Ensure we can logout an account and remove an authentication token
+    """
+    url = reverse('accounts:signout')
+
+    def setUp(self):
+        self.raw_password = 'testcasePaSsW0rdXYZ'
+        self.account = Account.objects.create_user(
+            email='testcase_accountlo@curiousqa.com',
+            username='testcase_accountlo',
+            password=self.raw_password)
+
+        # token already exists due to  generation of token on post_save of
+        # Account object
+        self.token = Token.objects.get(user=self.account)
+        self.api_authentication()
+
+    def api_authentication(self):
+        self.client.credentials(
+            HTTP_AUTHORIZATION='Token {}'.format(
+                self.token.key))
+
+    def test_signout(self):
+        response = self.client.post(path=self.url)
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+
+
 class AccountViewTestCase(APITestCase):
-    
+
     def setUp(self):
         self.raw_password = 'testcasePaSsW0rdXYZ'
         self.account = Account.objects.create_user(
@@ -55,14 +83,15 @@ class AccountViewTestCase(APITestCase):
             username='testcase_accountview1',
             password=self.raw_password)
 
-        # token already exists due to  generation of token on post_save of Account object
+        # token already exists due to  generation of token on post_save of
+        # Account object
         self.token = Token.objects.get(user=self.account)
         self.api_authentication()
-    
-    def api_authentication(self):
-        self.client.credentials(HTTP_AUTHORIZATION='Token {}'.format(self.token.key))
 
-        pass
+    def api_authentication(self):
+        self.client.credentials(
+            HTTP_AUTHORIZATION='Token {}'.format(
+                self.token.key))
 
     def test_get_account(self):
         pass
