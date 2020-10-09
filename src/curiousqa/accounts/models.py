@@ -12,13 +12,13 @@ class AccountManager(BaseUserManager):
     def create_user(self, email, username, password=None):
         if not email:
             raise ValueError('Users must have an email address')
-        if not username: 
+        if not username:
             raise ValueError('Users must have a username')
 
-        user = self.model (
+        user = self.model(
             email=self.normalize_email(email),
             username=username,
-    
+
         )
         user.set_password(password)
         user.save(using=self._db)
@@ -35,19 +35,28 @@ class AccountManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-class Account(AbstractBaseUser):
-    account_id   =  models.CharField(default=uuid.uuid4().hex, editable=False, unique=True, max_length=32)
-    email        =  models.EmailField(verbose_name="email", max_length=255, unique=True)
-    username     =  models.CharField(max_length=25, unique=True)
-    is_verified  =  models.BooleanField(default=False)
 
-    is_staff	 = models.BooleanField(default=False)
-    is_admin	 = models.BooleanField(default=False)
+class Account(AbstractBaseUser):
+    account_id = models.CharField(
+        default=uuid.uuid4().hex,
+        editable=False,
+        unique=True,
+        max_length=32)
+    email = models.EmailField(
+        verbose_name="email",
+        max_length=255,
+        unique=True)
+    username = models.CharField(max_length=25, unique=True)
+    is_verified = models.BooleanField(default=False)
+
+    is_staff = models.BooleanField(default=False)
+    is_admin = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
 
-    is_active    = models.BooleanField(default=True)
-    date_joined  = models.DateTimeField(verbose_name='date joined', auto_now_add=True)
-    last_login   = models.DateTimeField(verbose_name='last login', auto_now=True)
+    is_active = models.BooleanField(default=True)
+    date_joined = models.DateTimeField(
+        verbose_name='date joined', auto_now_add=True)
+    last_login = models.DateTimeField(verbose_name='last login', auto_now=True)
 
     objects = AccountManager()
 
@@ -72,8 +81,10 @@ class Account(AbstractBaseUser):
         # Simplest possible answer: All admins are staff
         return self.is_admin
 
+
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
-def create_authentication_token(sender, instance=None, created=False, **kwargs):
+def create_authentication_token(
+        sender, instance=None, created=False, **kwargs):
     if created:
         Token.objects.create(user=instance)
-    pass
+    
