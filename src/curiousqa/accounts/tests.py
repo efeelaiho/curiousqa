@@ -82,7 +82,7 @@ class AccountViewTestCase(APITestCase):
             email='testcase_accountview1@curiousqa.com',
             username='testcase_accountview1',
             password=self.raw_password)
-
+        self.url = reverse('accounts:account_instance', args=[self.account.account_id])
         # token already exists due to  generation of token on post_save of
         # Account object
         self.token = Token.objects.get(user=self.account)
@@ -94,7 +94,8 @@ class AccountViewTestCase(APITestCase):
                 self.token.key))
 
     def test_get_account(self):
-        pass
+        response = self.client.get(path=self.url)
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
 
     def test_update_account(self):
         pass
