@@ -75,6 +75,9 @@ class SignOutTestCase(APITestCase):
 
 
 class AccountViewTestCase(APITestCase):
+    """
+    Ensure we can perform rest method operations on an account instance
+    """
 
     def setUp(self):
         self.raw_password = 'testcasePaSsW0rdXYZ'
@@ -82,7 +85,9 @@ class AccountViewTestCase(APITestCase):
             email='testcase_accountview1@curiousqa.com',
             username='testcase_accountview1',
             password=self.raw_password)
-        self.url = reverse('accounts:account_instance', args=[self.account.account_id])
+        self.url = reverse(
+            'accounts:account_instance', args=[
+                self.account.account_id])
         # token already exists due to  generation of token on post_save of
         # Account object
         self.token = Token.objects.get(user=self.account)
@@ -101,5 +106,12 @@ class AccountViewTestCase(APITestCase):
         pass
 
     def test_delete_account(self):
+        account_deleted = False
+        response = self.client.delete(self.url)
+        try:
+            account = Account.objects.get(account_id=self.account.account_id)
+        except Account.DoesNotExist as adne:
+            account_deleted = True
 
-        pass
+        self.assertTrue(account_deleted)
+        self.assertEquals(response.status_code, status.HTTP_200_OK)

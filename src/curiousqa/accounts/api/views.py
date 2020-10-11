@@ -40,11 +40,11 @@ class AccountSignInView(GenericAPIView):
             return Response(
                 serializer.errors,
                 status=status.HTTP_400_BAD_REQUEST)
-        
+
         account = authenticate(
             password=serializer.data['password'],
             email=serializer.data['email'])
-        
+
         if not account:
             # there is no account with these credentials / wrong password
             response_msg = 'Invalid Credentials or activate account'
@@ -76,17 +76,17 @@ class AccountsUserView(GenericAPIView):
         account = request.user
 
         if account and account.account_id == account_id:
-            
-            data = {}
-            data['account_id'] = account.account_id
-            data['username'] = account.username
-            data['email'] = account.email
-
-            return Response(data, status=status.HTTP_200_OK)
+            account_serialized = AccountSerializer(account)
+            return Response(account_serialized.data, status=status.HTTP_200_OK)
 
         return Response({'response': 'Invalid Auth'},
                         status=status.HTTP_401_UNAUTHORIZED)
 
+    def delete(self, request, account_id):
+        account = request.user
+        if account and account.account_id == account_id:
+            account.delete()
+            return Response({'detail': 'Deleted'}, status=status.HTTP_200_OK)
 
-
-    
+        return Response({'response': 'Invalid Auth'},
+                        status=status.HTTP_401_UNAUTHORIZED)
