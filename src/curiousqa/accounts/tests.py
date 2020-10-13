@@ -86,7 +86,7 @@ class AccountViewTestCase(APITestCase):
             username='testcase_accountview1',
             password=self.raw_password)
         self.url = reverse(
-            'accounts:account_instance', args=[
+            'accounts:account', args=[
                 self.account.account_id])
         # token already exists due to  generation of token on post_save of
         # Account object
@@ -101,9 +101,6 @@ class AccountViewTestCase(APITestCase):
     def test_get_account(self):
         response = self.client.get(path=self.url)
         self.assertEquals(response.status_code, status.HTTP_200_OK)
-
-    def test_update_account(self):
-        pass
 
     def test_delete_account(self):
         account_deleted = False

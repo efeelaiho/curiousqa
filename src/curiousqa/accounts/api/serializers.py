@@ -18,7 +18,7 @@ class AccountRegistrationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Account
-        fields = ['account_id', 'username', 'email', 'password']
+        fields = ['username', 'email', 'password']
 
     def create(self, validated_data):
         # unpack validated data
@@ -33,4 +33,4 @@ class AccountSignInSerializer(serializers.Serializer):
 class AccountSerializer(serializers.ModelSerializer):
     class Meta:
         model = Account
-        fields = ['account_id', 'username', 'email', ]
+        fields = ['account_id', 'username', 'email']

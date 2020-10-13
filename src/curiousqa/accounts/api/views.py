@@ -73,20 +73,23 @@ class AccountsUserView(GenericAPIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, account_id):
+        """ Get the account data """
         account = request.user
 
         if account and account.account_id == account_id:
             account_serialized = AccountSerializer(account)
             return Response(account_serialized.data, status=status.HTTP_200_OK)
 
-        return Response({'response': 'Invalid Auth'},
+        return Response({'detail': 'Invalid Auth'},
                         status=status.HTTP_401_UNAUTHORIZED)
 
     def delete(self, request, account_id):
+        """ Delete an account """
         account = request.user
+
         if account and account.account_id == account_id:
             account.delete()
             return Response({'detail': 'Deleted'}, status=status.HTTP_200_OK)
 
-        return Response({'response': 'Invalid Auth'},
+        return Response({'detail': 'Invalid Auth'},
                         status=status.HTTP_401_UNAUTHORIZED)
