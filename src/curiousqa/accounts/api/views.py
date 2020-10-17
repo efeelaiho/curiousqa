@@ -1,7 +1,7 @@
 from accounts.api.authentications import get_expires_in, token_expire_handler
 from accounts.api.serializers import (AccountRegistrationSerializer,
                                       AccountSerializer,
-                                      AccountSignInSerializer)
+                                      AccountSignInSerializer, ChangePasswordSerializer)
 from django.contrib.auth import authenticate
 from django.shortcuts import render
 from rest_framework import status
@@ -25,7 +25,8 @@ class AccountRegisterView(GenericAPIView):
             return Response({
                 'account': account_serialized.data,
                 'token': token.key,
-                'token_expires_in': get_expires_in(token)}, status=status.HTTP_201_CREATED)
+                'token_expires_in': get_expires_in(token)},
+                status=status.HTTP_201_CREATED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -58,7 +59,8 @@ class AccountSignInView(GenericAPIView):
         return Response({
             'account': account_serialized.data,
             'token': token.key,
-            'token_expires_in': get_expires_in(token)}, status=status.HTTP_200_OK)
+            'token_expires_in': get_expires_in(token)},
+            status=status.HTTP_200_OK)
 
 
 class AccountSignOutView(GenericAPIView):
@@ -93,3 +95,30 @@ class AccountsUserView(GenericAPIView):
 
         return Response({'detail': 'Invalid Auth'},
                         status=status.HTTP_401_UNAUTHORIZED)
+
+
+class ChangePasswordView(GenericAPIView):
+    serializer_class = ChangePasswordSerializer
+    permission_classes = [IsAuthenticated]
+
+    def put(self, request, account_id):
+        account = request.user
+
+        if account and account.account_id == account_id:
+            serializer = ChangePasswordSerializer(data=request.data)
+            if serializer.is_valid():
+                if not account.check_password(
+                        serializer.data.get("old_password")):
+                    return Response({'detail': 'Incorrect Password'},
+                                    status=status.HTTP_400_BAD_REQUEST)
+                else:
+                    account.set_password(serializer.data.get('new_password'))
+                    account.save()
+                    return Response(status=status.HTTP_204_NO_CONTENT)
+
+        return Response({'detail': 'Invalid Auth'},
+                        status=status.HTTP_401_UNAUTHORIZED)
+
+
+class ChangeEmailView(GenericAPIView):
+    pass

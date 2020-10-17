@@ -104,7 +104,7 @@ class AccountViewTestCase(APITestCase):
 
     def test_delete_account(self):
         account_deleted = False
-        response = self.client.delete(self.url)
+        response = self.client.delete(path=self.url)
         try:
             account = Account.objects.get(account_id=self.account.account_id)
         except Account.DoesNotExist as adne:
@@ -112,3 +112,31 @@ class AccountViewTestCase(APITestCase):
 
         self.assertTrue(account_deleted)
         self.assertEquals(response.status_code, status.HTTP_200_OK)
+
+
+class AccountPasswordChangeTestCase(APITestCase):
+    """
+    Ensure we can change the password on an account instance
+    """
+
+    def setUp(self):
+        self.original_password = 'a1b2c3d4e5f6g7'
+        self.account = Account.objects.create_user(
+            email='testcase_for_password@curiousqa.com',
+            username='testcase_password',
+            password=self.original_password)
+        self.url = reverse('accounts:password', args=[
+            self.account.account_id])
+        self.token = Token.objects.get(user=self.account)
+        self.api_authentication()
+
+    def api_authentication(self):
+        self.client.credentials(
+            HTTP_AUTHORIZATION='Token {}'.format(
+                self.token.key))
+
+    def test_password_change(self):
+        data = {'old_password': self.original_password,
+                'new_password': 'I_AM_A_NEW_PASSWORD1'}
+        repsponse = self.client.put(path=self.url, data=data)
+        self.assertEquals(repsponse.status_code, status.HTTP_204_NO_CONTENT)
