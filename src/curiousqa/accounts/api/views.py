@@ -1,7 +1,8 @@
 from accounts.api.authentications import get_expires_in, token_expire_handler
 from accounts.api.serializers import (AccountRegistrationSerializer,
                                       AccountSerializer,
-                                      AccountSignInSerializer, ChangePasswordSerializer)
+                                      AccountSignInSerializer, ChangePasswordSerializer,
+                                      ChangeEmailSerializer)
 from django.contrib.auth import authenticate
 from django.shortcuts import render
 from rest_framework import status
@@ -9,6 +10,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
+from accounts.models import Account
 
 
 class AccountRegisterView(GenericAPIView):
@@ -121,4 +123,24 @@ class ChangePasswordView(GenericAPIView):
 
 
 class ChangeEmailView(GenericAPIView):
-    pass
+    serializer_class = ChangeEmailSerializer
+    permission_classes = [IsAuthenticated]
+
+    def put(self, request, account_id):
+        account = request.user
+
+        if account and account.account_id == account_id:
+            serializer = ChangeEmailSerializer(data=request.data)
+            if serializer.is_valid():
+                try:
+                    queried_account = Account.objects.get(
+                        email=serializer.data.get('email'))
+                    return Response({'detail': 'A user with that email already exists.'},
+                                    status=status.HTTP_400_BAD_REQUEST)
+                except Account.DoesNotExist:
+                    account.email = serializer.data.get('email')
+                    account.save()
+                    return Response(status=status.HTTP_204_NO_CONTENT)
+
+        return Response({'detail': 'Invalid Auth'},
+                        status=status.HTTP_401_UNAUTHORIZED)
