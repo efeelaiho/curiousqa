@@ -3,4 +3,6 @@
 A simple, anonymous/non-anonymous(voluntarily), and social, Q&A platform
 
 Greetings!
+
+#### Currently under development, and in preparation for contribution. :construction: :construction:
  
