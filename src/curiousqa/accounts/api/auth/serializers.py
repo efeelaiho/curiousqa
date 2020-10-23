@@ -2,7 +2,6 @@ from accounts.models import Account
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
-
 class AccountRegistrationSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(
         max_length=255,
@@ -24,21 +23,11 @@ class AccountRegistrationSerializer(serializers.ModelSerializer):
         # unpack validated data
         return Account.objects.create_user(**validated_data)
 
-
 class AccountSignInSerializer(serializers.Serializer):
     email = serializers.EmailField(required=True, allow_blank=False)
     password = serializers.CharField(required=True, allow_blank=False)
-
 
 class AccountSerializer(serializers.ModelSerializer):
     class Meta:
         model = Account
         fields = ['account_id', 'username', 'email']
-
-
-class ChangePasswordSerializer(serializers.Serializer):
-    old_password = serializers.CharField(required=True)
-    new_password = serializers.CharField(required=True)
-
-class ChangeEmailSerializer(serializers.Serializer):
-    email = serializers.EmailField(max_length=255,min_length=None)

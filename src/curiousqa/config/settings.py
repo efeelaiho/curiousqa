@@ -46,13 +46,14 @@ INSTALLED_APPS = [
     'accounts',
     'questions',
     'answers',
+    
 ]
 
 AUTH_USER_MODEL = 'accounts.Account'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'accounts.api.authentications.ExpiringTokenAuthentication',  # custom authentication class
+        'accounts.api.auth.authentications.ExpiringTokenAuthentication',  # custom authentication class
     ],
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',

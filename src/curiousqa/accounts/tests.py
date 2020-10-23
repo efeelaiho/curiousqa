@@ -6,7 +6,6 @@ from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APITestCase
 
-from accounts.api.serializers import AccountRegistrationSerializer
 from accounts.models import Account
 
 
@@ -14,11 +13,12 @@ class RegistrationTestCase(APITestCase):
     """
     Ensure we can create a new account object via registration.
     """
+    url = reverse('accounts_auth:register')
 
     def test_registration(self):
         data = {'username': 'testcase', 'email': 'testcase@curiousqa.com',
                 'password': 'testcasePaSsW0rd123'}
-        response = self.client.post(path='/accounts/auth/register', data=data)
+        response = self.client.post(path=self.url, data=data)
         self.assertEquals(
             response.status_code,
             status.HTTP_201_CREATED,
@@ -30,6 +30,8 @@ class SignInTestCase(APITestCase):
     Ensure we can login an account and obtain an authentication token
     """
 
+    url = reverse('accounts_auth:signin')
+
     def setUp(self):
         self.raw_password = 'testcasePaSsW0rdXYZ'
         self.account = Account.objects.create_user(
@@ -39,7 +41,7 @@ class SignInTestCase(APITestCase):
 
     def test_signin(self):
         data = {'email': self.account.email, 'password': self.raw_password}
-        response = self.client.post(path='/accounts/auth/signin', data=data)
+        response = self.client.post(path=self.url, data=data)
         self.assertIn('token', response.data)
         self.assertIn('account', response.data)
         self.assertIn('token_expires_in', response.data)
@@ -50,7 +52,7 @@ class SignOutTestCase(APITestCase):
     """
     Ensure we can logout an account and remove an authentication token
     """
-    url = reverse('accounts:signout')
+    url = reverse('accounts_auth:signout')
 
     def setUp(self):
         self.raw_password = 'testcasePaSsW0rdXYZ'
@@ -85,9 +87,7 @@ class AccountViewTestCase(APITestCase):
             email='testcase_accountview1@curiousqa.com',
             username='testcase_accountview1',
             password=self.raw_password)
-        self.url = reverse(
-            'accounts:account', args=[
-                self.account.account_id])
+        self.url = reverse('accounts_user:account')
         # token already exists due to  generation of token on post_save of
         # Account object
         self.token = Token.objects.get(user=self.account)
@@ -125,8 +125,7 @@ class AccountPasswordChangeTestCase(APITestCase):
             email='testcase_for_password@curiousqa.com',
             username='testcase_password',
             password=self.original_password)
-        self.url = reverse('accounts:password', args=[
-            self.account.account_id])
+        self.url = reverse('accounts_user:password')
         self.token = Token.objects.get(user=self.account)
         self.api_authentication()
 
@@ -153,8 +152,7 @@ class AccountEmailChangeTestCase(APITestCase):
             email='testcase_for_email@curiousqa.com',
             username='testcase_email',
             password=self.original_password)
-        self.url = reverse('accounts:email', args=[
-            self.account.account_id])
+        self.url = reverse('accounts_user:email')
         self.token = Token.objects.get(user=self.account)
         self.api_authentication()
 
