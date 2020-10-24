@@ -6,6 +6,7 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from profiles.models import Profile
 from rest_framework.authtoken.models import Token
 
 
@@ -62,7 +63,7 @@ class Account(AbstractBaseUser):
     objects = AccountManager()
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = []
+    REQUIRED_FIELDS = ['username']
 
     def __str__(self):
         return self.email
@@ -88,3 +89,12 @@ def create_authentication_token(
         sender, instance=None, created=False, **kwargs):
     if created:
         Token.objects.create(user=instance)
+
+@receiver(post_save, sender=settings.AUTH_USER_MODEL)
+def create_account_profile(sender, instance, created, **kwargs):
+    if created:
+        Profile.objects.create(account=instance)
+
+@receiver(post_save, sender=settings.AUTH_USER_MODEL)
+def save_account_profile(sender, instance, **kwargs):
+    instance.profile.save()

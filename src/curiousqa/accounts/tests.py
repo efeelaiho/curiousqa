@@ -1,5 +1,3 @@
-import json
-
 from django.test import TestCase
 from django.urls import reverse
 from rest_framework import status
@@ -7,6 +5,24 @@ from rest_framework.authtoken.models import Token
 from rest_framework.test import APITestCase
 
 from accounts.models import Account
+
+class APIAuthenticatedTest(APITestCase):
+    def setUp(self):
+        self.raw_password = 'testcasePaSsW0rdXYZ'
+        self.account = Account.objects.create_user(
+            email='testcase_account@curiousqa.com',
+            username='testcase_account',
+            password=self.raw_password)
+
+        # token already exists due to  generation of token on post_save of
+        # Account object
+        self.token = Token.objects.get(user=self.account)
+        self.api_authentication()
+
+    def api_authentication(self):
+        self.client.credentials(
+            HTTP_AUTHORIZATION='Token {}'.format(
+                self.token.key))
 
 
 class RegistrationTestCase(APITestCase):
@@ -25,19 +41,11 @@ class RegistrationTestCase(APITestCase):
             msg="Test Registration")
 
 
-class SignInTestCase(APITestCase):
+class SignInTestCase(APIAuthenticatedTest):
     """
     Ensure we can login an account and obtain an authentication token
     """
-
     url = reverse('accounts_auth:signin')
-
-    def setUp(self):
-        self.raw_password = 'testcasePaSsW0rdXYZ'
-        self.account = Account.objects.create_user(
-            email='testcase@curiousqa.com',
-            username='testcase',
-            password=self.raw_password)
 
     def test_signin(self):
         data = {'email': self.account.email, 'password': self.raw_password}
@@ -48,55 +56,22 @@ class SignInTestCase(APITestCase):
         self.assertEquals(response.status_code, status.HTTP_200_OK)
 
 
-class SignOutTestCase(APITestCase):
+class SignOutTestCase(APIAuthenticatedTest):
     """
     Ensure we can logout an account and remove an authentication token
     """
     url = reverse('accounts_auth:signout')
-
-    def setUp(self):
-        self.raw_password = 'testcasePaSsW0rdXYZ'
-        self.account = Account.objects.create_user(
-            email='testcase_accountlo@curiousqa.com',
-            username='testcase_accountlo',
-            password=self.raw_password)
-
-        # token already exists due to  generation of token on post_save of
-        # Account object
-        self.token = Token.objects.get(user=self.account)
-        self.api_authentication()
-
-    def api_authentication(self):
-        self.client.credentials(
-            HTTP_AUTHORIZATION='Token {}'.format(
-                self.token.key))
 
     def test_signout(self):
         response = self.client.post(path=self.url)
         self.assertEquals(response.status_code, status.HTTP_200_OK)
 
 
-class AccountViewTestCase(APITestCase):
+class AccountViewTestCase(APIAuthenticatedTest):
     """
     Ensure we can perform rest method operations on an account instance
     """
-
-    def setUp(self):
-        self.raw_password = 'testcasePaSsW0rdXYZ'
-        self.account = Account.objects.create_user(
-            email='testcase_accountview1@curiousqa.com',
-            username='testcase_accountview1',
-            password=self.raw_password)
-        self.url = reverse('accounts_user:account')
-        # token already exists due to  generation of token on post_save of
-        # Account object
-        self.token = Token.objects.get(user=self.account)
-        self.api_authentication()
-
-    def api_authentication(self):
-        self.client.credentials(
-            HTTP_AUTHORIZATION='Token {}'.format(
-                self.token.key))
+    url = reverse('accounts_user:account')
 
     def test_get_account(self):
         response = self.client.get(path=self.url)
@@ -114,52 +89,24 @@ class AccountViewTestCase(APITestCase):
         self.assertEquals(response.status_code, status.HTTP_200_OK)
 
 
-class AccountPasswordChangeTestCase(APITestCase):
+class AccountPasswordChangeTestCase(APIAuthenticatedTest):
     """
     Ensure we can change the password on an account instance
     """
-
-    def setUp(self):
-        self.original_password = 'a1b2c3d4e5f6g7'
-        self.account = Account.objects.create_user(
-            email='testcase_for_password@curiousqa.com',
-            username='testcase_password',
-            password=self.original_password)
-        self.url = reverse('accounts_user:password')
-        self.token = Token.objects.get(user=self.account)
-        self.api_authentication()
-
-    def api_authentication(self):
-        self.client.credentials(
-            HTTP_AUTHORIZATION='Token {}'.format(
-                self.token.key))
+    url = reverse('accounts_user:password')
 
     def test_password_change(self):
-        data = {'old_password': self.original_password,
+        data = {'old_password': self.raw_password,
                 'new_password': 'I_AM_A_NEW_PASSWORD1'}
         repsponse = self.client.put(path=self.url, data=data)
         self.assertEquals(repsponse.status_code, status.HTTP_204_NO_CONTENT)
 
 
-class AccountEmailChangeTestCase(APITestCase):
+class AccountEmailChangeTestCase(APIAuthenticatedTest):
     """
     Ensure we can change the email on an account instance
-
     """
-    def setUp(self):
-        self.original_password = 'a1b2c3d4e5f6g7'
-        self.account = Account.objects.create_user(
-            email='testcase_for_email@curiousqa.com',
-            username='testcase_email',
-            password=self.original_password)
-        self.url = reverse('accounts_user:email')
-        self.token = Token.objects.get(user=self.account)
-        self.api_authentication()
-
-    def api_authentication(self):
-        self.client.credentials(
-            HTTP_AUTHORIZATION='Token {}'.format(
-                self.token.key))
+    url = reverse('accounts_user:email')
 
     def test_email_change(self):
         data = {'email': 'new_email@curiousqa.com'}
