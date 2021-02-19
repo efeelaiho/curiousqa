@@ -1,3 +1,4 @@
+import base64
 import uuid
 
 from django.conf import settings
@@ -5,6 +6,7 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from profiles.models import Profile
 from rest_framework.authtoken.models import Token
 
 
@@ -18,7 +20,6 @@ class AccountManager(BaseUserManager):
         user = self.model(
             email=self.normalize_email(email),
             username=username,
-
         )
         user.set_password(password)
         user.save(using=self._db)
@@ -38,7 +39,8 @@ class AccountManager(BaseUserManager):
 
 class Account(AbstractBaseUser):
     account_id = models.CharField(
-        default=uuid.uuid4().hex,
+        default=base64.urlsafe_b64encode(
+            uuid.uuid4().bytes).decode('utf-8').replace('=', ''),
         editable=False,
         unique=True,
         max_length=32)
@@ -61,7 +63,7 @@ class Account(AbstractBaseUser):
     objects = AccountManager()
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = []
+    REQUIRED_FIELDS = ['username']
 
     def __str__(self):
         return self.email
@@ -87,4 +89,12 @@ def create_authentication_token(
         sender, instance=None, created=False, **kwargs):
     if created:
         Token.objects.create(user=instance)
-    
+
+@receiver(post_save, sender=settings.AUTH_USER_MODEL)
+def create_account_profile(sender, instance, created, **kwargs):
+    if created:
+        Profile.objects.create(account=instance)
+
+@receiver(post_save, sender=settings.AUTH_USER_MODEL)
+def save_account_profile(sender, instance, **kwargs):
+    instance.profile.save()

@@ -1,4 +1,4 @@
-"""server URL Configuration
+"""config URL Configuration
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/3.1/topics/http/urls/
@@ -18,5 +18,8 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('accounts/', include('accounts.api.urls', 'accounts_api')),
+    path('auth/', include('accounts.api.auth.urls', 'accounts_auth')),
+    path('accounts/', include('accounts.api.user.urls', 'accounts_user')),
+    path('profiles/', include('profiles.api.user.urls', 'profiles_user')),
 ]
+

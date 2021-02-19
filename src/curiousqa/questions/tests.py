@@ -1,4 +1,3 @@
-from accounts.api.serializers import AccountRegistrationSerializer
 from accounts.models import Account
 from django.test import TestCase
 from django.urls import reverse
